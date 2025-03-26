@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('address');
             $table->text('description');
-            $table->string('category');
+            $table->enum('category', ['Restaurant', 'Taverna', 'Mezedopoleion', 'Brunch', 'Pizza', 'Sushi', 'Burgeradiko', 'Tsipouradiko']);
             $table->string('info_link');
             $table->float('rating')->nullable();
             $table->timestamps();

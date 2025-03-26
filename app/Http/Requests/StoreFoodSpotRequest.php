@@ -1,5 +1,4 @@
 <?php
-// filepath: /C:/tsimpologion-app/tsimpologion-backend/app/Http/Requests/StoreFoodSpotRequest.php
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
