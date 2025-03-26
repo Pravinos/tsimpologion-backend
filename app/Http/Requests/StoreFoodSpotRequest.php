@@ -1,0 +1,25 @@
+<?php
+// filepath: /C:/tsimpologion-app/tsimpologion-backend/app/Http/Requests/StoreFoodSpotRequest.php
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreFoodSpotRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'description' => 'string',
+            'category' => 'required|string|max:255',
+            'info_link' => 'string|max:500',
+            'rating' => 'nullable|numeric|min:0|max:5',
+        ];
+    }
+}
