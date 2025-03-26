@@ -28,14 +28,14 @@ class FoodSpotController extends Controller
     public function store(StoreFoodSpotRequest $request)
     {
         $validated = $request->validated();
-        
+
         // Assign ownership to the current user if they're a spot owner
         if (auth()->user()->isSpotOwner()) {
             $validated['owner_id'] = auth()->id();
         }
-        
+
         $food_spot = FoodSpot::create($validated);
-      
+
         return response()->json($food_spot, 201);
     }
 
@@ -63,8 +63,8 @@ class FoodSpotController extends Controller
     public function destroy(FoodSpot $food_spot)
     {
         $food_spot->delete(); // Soft delete
-        
-        return response()->json(['message' => 'Food spot deleted successfully'], 200);
+
+        return response()->json(['message' => 'OK'], 200);
     }
 
     /**
@@ -74,9 +74,9 @@ class FoodSpotController extends Controller
     {
         $food_spot = FoodSpot::withTrashed()->findOrFail($id);
         $this->authorize('restore', $food_spot);
-        
+
         $food_spot->restore();
-        
+
         return response()->json($food_spot, 200);
     }
 
@@ -87,9 +87,9 @@ class FoodSpotController extends Controller
     {
         $food_spot = FoodSpot::withTrashed()->findOrFail($id);
         $this->authorize('forceDelete', $food_spot);
-        
+
         $food_spot->forceDelete();
-        
+
         return response()->json(['message' => 'Food spot permanently deleted'], 200);
     }
 }

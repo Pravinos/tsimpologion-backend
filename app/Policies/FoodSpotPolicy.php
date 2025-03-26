@@ -19,9 +19,9 @@ class FoodSpotPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(?User $user, FoodSpot $foodSpot): bool
+    public function view(?User $user, FoodSpot $food_spot): bool
     {
-        return true; 
+        return true;
     }
 
     /**
@@ -35,25 +35,25 @@ class FoodSpotPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, FoodSpot $foodSpot): bool
+    public function update(User $user, FoodSpot $food_spot): bool
     {
-        return $user->isAdmin() || 
-               ($user->isSpotOwner() && $user->id === $foodSpot->owner_id);
+        return $user->isAdmin() ||
+               ($user->isSpotOwner() && $user->id === $food_spot->owner_id);
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, FoodSpot $foodSpot): bool
+    public function delete(User $user, FoodSpot $food_spot): bool
     {
-        return $user->isAdmin() || 
-               ($user->isSpotOwner() && $user->id === $foodSpot->owner_id);
+        return $user->isAdmin() ||
+               ($user->isSpotOwner() && $user->id === $food_spot->owner_id);
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, FoodSpot $foodSpot): bool
+    public function restore(User $user, FoodSpot $food_spot): bool
     {
         return $user->isAdmin();
     }
@@ -61,7 +61,7 @@ class FoodSpotPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, FoodSpot $foodSpot): bool
+    public function forceDelete(User $user, FoodSpot $food_spot): bool
     {
         return $user->isAdmin();
     }
