@@ -14,9 +14,10 @@ class StoreFoodSpotRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'description' => 'string',
-            'category' => 'required|string|max:255',
             'info_link' => 'string|max:500',
             'rating' => 'nullable|numeric|min:0|max:5',
             'owner_id' => 'nullable|numeric',

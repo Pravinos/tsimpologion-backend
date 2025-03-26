@@ -14,9 +14,10 @@ class UpdateFoodSpotRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|string|max:255',
+            'category' => 'sometimes|string|max:255',
+            'city' => 'sometimes|string|max:255',
             'address' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
-            'category' => 'sometimes|string|max:255',
             'info_link' => 'sometimes|string|max:500',
             'rating' => 'nullable|numeric|min:0|max:5',
             'owner_id' => 'nullable|numeric',

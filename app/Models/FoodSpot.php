@@ -19,9 +19,10 @@ class FoodSpot extends Model
      */
     protected $fillable = [
         'name',
+        'category',
+        'city',
         'address',
         'description',
-        'category',
         'info_link',
         'rating',
         'owner_id',

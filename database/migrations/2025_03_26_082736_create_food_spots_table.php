@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('food_spots', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->enum('category', ['Restaurant', 'Taverna', 'Mezedopoleion', 'Brunch', 'Pizza', 'Sushi', 'Burgeradiko', 'Tsipouradiko']);
+            $table->string('city');
             $table->string('address');
             $table->text('description');
-            $table->enum('category', ['Restaurant', 'Taverna', 'Mezedopoleion', 'Brunch', 'Pizza', 'Sushi', 'Burgeradiko', 'Tsipouradiko']);
             $table->string('info_link');
             $table->float('rating')->nullable();
             $table->unsignedBigInteger('owner_id')->nullable();

@@ -90,11 +90,12 @@ The backend uses a single table, **food_spots**, to store data about food spots.
 |--------------|--------------|------------------------------|--------------------------------|
 | id           | BIGINT (PK)  | Auto-incrementing primary key| 1                              |
 | name         | VARCHAR(255) | Name of the food spot        | "Taverna To Koutouki"          |
+| category     | VARCHAR(255) | Category of the food spot    | Taverna                        |
+| city         | VARCHAR(255) | City of the spot             | Athens                        |
 | address      | VARCHAR(255) | Physical address             | "Leof. Mesogeion 123, Athens"  |
 | description  | TEXT         | Short description of the spot| "Cozy spot for grilled meats"  |
 | info_link    | VARCHAR(255) | Google Maps share link       | "https://maps.app.goo.gl/xyz"  |
 | rating       | FLOAT        | Optional user rating (0-5)   | 4.7                            |
-| category     | VARCHAR(255) | Category of the food spot    | Taverna                      |
 | owner_id     | BIGINT       | Foreign key referencing the user who owns the food spot | 2                              |
 | created_at   | TIMESTAMP    | Record creation time         | 2025-03-25 10:00:00            |
 | updated_at   | TIMESTAMP    | Record update time           | 2025-03-25 10:00:00            |
@@ -153,4 +154,4 @@ This project is for portfolio purposes and is not currently licensed for public 
 
 ## Contact
 Built by Thomas Pravinos.  
-Reach out at tpravinos99@gmail.com or visit [GitHub](https://github.com/yourusername).
+Reach out at tpravinos99@gmail.com or visit [GitHub](https://github.com/Pravinos).
