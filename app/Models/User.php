@@ -47,4 +47,36 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the food spots owned by the user.
+     */
+    public function foodSpots(): HasMany
+    {
+        return $this->hasMany(FoodSpot::class, 'owner_id');
+    }
+
+     /**
+     * Check if user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+     /**
+     * Check if user is a spot owner.
+     */
+    public function isSpotOwner(): bool
+    {
+        return $this->role === 'spot_owner';
+    }
+
+    /**
+     * Check if user is a foodie.
+     */
+    public function isFoodie(): bool
+    {
+        return $this->role === 'foodie';
+    }
 }

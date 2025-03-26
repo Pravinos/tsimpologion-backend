@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\User;
 
 class FoodSpot extends Model
 {
@@ -21,6 +23,7 @@ class FoodSpot extends Model
         'category',
         'info_link',
         'rating',
+        'owner_id',
     ];
 
     /**
@@ -31,4 +34,12 @@ class FoodSpot extends Model
     protected $casts = [
         'rating' => 'float',
     ];
+
+     /**
+     * Get the user that owns the food spot.
+     */
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
 }

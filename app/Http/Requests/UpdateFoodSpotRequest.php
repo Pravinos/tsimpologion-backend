@@ -19,6 +19,7 @@ class UpdateFoodSpotRequest extends FormRequest
             'category' => 'sometimes|string|max:255',
             'info_link' => 'sometimes|string|max:500',
             'rating' => 'nullable|numeric|min:0|max:5',
+            'owner_id' => 'nullable|numeric',
         ];
     }
 }

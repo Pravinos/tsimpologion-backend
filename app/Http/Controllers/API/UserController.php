@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -9,12 +8,27 @@ use App\Http\Requests\UpdateUserRequest;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(User::class, 'user');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return response()->json(User::all());
+
+        // Filter users based on current user's role
+        if (auth()->user()->isAdmin()) {
+            // Admins can see all users
+            $users = User::all();
+        } else {
+            // Non-admins can't see admin users
+            $users = User::where('role', '!=', 'admin')->get();
+        }
+
+        return response()->json($users, 200);
     }
 
     /**
@@ -24,16 +38,19 @@ class UserController extends Controller
     {
         $user = User::create($request->validated());
       
-        return response()->json($user, 200);
+        return response()->json($user, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user)
     {
-        $user = User::find($id);
-        
+         // Check for admin visibility
+         if ($user->isAdmin() && !auth()->user()->isAdmin()) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
         return response()->json($user, 200);
     }
 
@@ -54,6 +71,6 @@ class UserController extends Controller
     {
         $user->delete();
         
-        return response()->json('OK', 200);
+        return response()->json(['message' => 'OK'], 200);
     }
 }

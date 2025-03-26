@@ -19,6 +19,8 @@ return new class extends Migration
             $table->enum('category', ['Restaurant', 'Taverna', 'Mezedopoleion', 'Brunch', 'Pizza', 'Sushi', 'Burgeradiko', 'Tsipouradiko']);
             $table->string('info_link');
             $table->float('rating')->nullable();
+            $table->unsignedBigInteger('owner_id')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

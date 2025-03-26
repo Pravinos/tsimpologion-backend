@@ -19,6 +19,7 @@ class StoreFoodSpotRequest extends FormRequest
             'category' => 'required|string|max:255',
             'info_link' => 'string|max:500',
             'rating' => 'nullable|numeric|min:0|max:5',
+            'owner_id' => 'nullable|numeric',
         ];
     }
 }
