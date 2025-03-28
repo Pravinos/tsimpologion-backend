@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
+use App\Traits\HasImages;
 
 class FoodSpot extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasImages;
 
     /**
      * The attributes that are mass assignable.
@@ -26,6 +27,7 @@ class FoodSpot extends Model
         'info_link',
         'rating',
         'owner_id',
+        'images',
     ];
 
     /**
@@ -35,6 +37,7 @@ class FoodSpot extends Model
      */
     protected $casts = [
         'rating' => 'float',
+        'images' => 'array',
     ];
 
      /**
@@ -60,4 +63,10 @@ class FoodSpot extends Model
     {
         return $this->reviews()->where('is_approved', true)->avg('rating') ?? 0;
     }
+
+     // If needed, override the method
+     public function getImageFolder(): string
+     {
+         return 'food-spots';
+     }
 }

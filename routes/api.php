@@ -5,12 +5,15 @@ use App\Http\Controllers\API\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ReviewController;
+use App\Http\Controllers\API\ImageController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/food-spots', [FoodSpotController::class, 'index']);
 Route::get('/food-spots/{food_spot}/rating', [ReviewController::class, 'averageRating']);
+Route::get('/images/{model_type}/{id}', [ImageController::class, 'viewAll']);
+Route::get('/images/{model_type}/{id}/{image_id}', [ImageController::class, 'viewOne']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -28,4 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('food-spots.reviews', ReviewController::class);
     Route::put('/food-spots/{food_spot}/reviews/{review}/moderate', [ReviewController::class, 'moderate']);
 
+    // Image routes
+    Route::post('/images/{modelType}/{id}', [ImageController::class, 'upload']);
+    Route::delete('/images/{model_type}/{id}/{image_id}', [ImageController::class, 'delete']);
 });

@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
 use App\Models\FoodSpot;
+use App\Traits\HasImages;
 
 class Review extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasImages;
 
     protected $fillable = [
         'food_spot_id',
@@ -18,11 +19,13 @@ class Review extends Model
         'comment',
         'rating',
         'is_approved',
+        'images',
     ];
 
     protected $casts = [
         'rating' => 'integer',
         'is_approved' => 'boolean',
+        'images' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -34,4 +37,10 @@ class Review extends Model
     {
         return $this->belongsTo(FoodSpot::class);
     }
+
+     // Only review authors can manage review images
+     public function userCanManageImages($user): bool
+     {
+         return $user->id === $this->user_id || $user->isAdmin();
+     }
 }
