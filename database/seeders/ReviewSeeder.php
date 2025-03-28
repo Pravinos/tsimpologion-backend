@@ -15,10 +15,10 @@ class ReviewSeeder extends Seeder
 
         foreach ($food_spots as $food_spot) {
             // Add 3-5 reviews per food spot
-            $reviewCount = rand(3, 5);
-            $selectedUsers = $users->random($reviewCount);
+            $review_count = rand(3, 5);
+            $selected_users = $users->random($review_count);
 
-            foreach ($selectedUsers as $user) {
+            foreach ($selected_users as $user) {
                 Review::create([
                     'user_id' => $user->id,
                     'food_spot_id' => $food_spot->id,

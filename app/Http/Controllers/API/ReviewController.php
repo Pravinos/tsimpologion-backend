@@ -12,7 +12,7 @@ class ReviewController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(Review::class, 'review');
+        $this->middleware('auth:sanctum')->except(['index', 'show']);
     }
 
     /**
@@ -20,12 +20,12 @@ class ReviewController extends Controller
      */
     public function index(FoodSpot $food_spot)
     {
-        return response()->json(
-            $food_spot->reviews()
-                ->with('user:id,name') // Include user name but not email
-                ->where('is_approved', true)
-                ->get()
-        );
+        $reviews = $food_spot->reviews()
+            ->where('is_approved', true)
+            ->with('user:id,name')
+            ->get();
+
+        return response()->json($reviews, 200);
     }
 
     /**
@@ -61,47 +61,71 @@ class ReviewController extends Controller
     /**
      * Show a specific review.
      */
-    public function show(Review $review)
+    public function show(FoodSpot $food_spot, Review $review)
     {
+        // Verify the review belongs to this food spot
+        if ($review->food_spot_id !== $food_spot->id) {
+            return response()->json(['message' => 'Review not found for this food spot'], 404);
+        }
+
         $review->load('user:id,name');
-        return response()->json($review);
+        return response()->json($review, 200);
     }
 
     /**
      * Update a review.
      */
-    public function update(UpdateReviewRequest $request, Review $review)
+    public function update(UpdateReviewRequest $request, FoodSpot $food_spot, Review $review)
     {
+        // Verify the review belongs to this food spot
+        if ($review->food_spot_id !== $food_spot->id) {
+            return response()->json(['message' => 'Review not found for this food spot'], 404);
+        }
+
+        // Authorize the action
+        $this->authorize('update', $review);
+
         $review->update($request->validated());
 
         // Update the food spot's average rating
-        $food_spot = $review->foodSpot;
         $food_spot->rating = $food_spot->getAverageRatingAttribute();
         $food_spot->save();
 
-        return response()->json($review);
+        return response()->json($review, 200);
     }
 
     /**
      * Delete a review.
      */
-    public function destroy(Review $review)
+    public function destroy(FoodSpot $food_spot, Review $review)
     {
-        $food_spot = $review->foodSpot;
+        // Verify the review belongs to this food spot
+        if ($review->food_spot_id !== $food_spot->id) {
+            return response()->json(['message' => 'Review not found for this food spot'], 404);
+        }
+
+        // Authorize the action
+        $this->authorize('delete', $review);
+
         $review->delete();
 
         // Update the food spot's average rating after deleting
         $food_spot->rating = $food_spot->getAverageRatingAttribute();
         $food_spot->save();
 
-        return response()->json(['message' => 'Review deleted successfully']);
+        return response()->json(['message' => 'OK', 200]);
     }
 
     /**
      * Moderate a review (admin only).
      */
-    public function moderate(Request $request, Review $review)
+    public function moderate(Request $request, FoodSpot $food_spot, Review $review)
     {
+        // Verify the review belongs to this food spot
+        if ($review->food_spot_id !== $food_spot->id) {
+            return response()->json(['message' => 'Review not found for this food spot'], 404);
+        }
+
         $this->authorize('moderate', $review);
 
         $request->validate([
@@ -112,10 +136,25 @@ class ReviewController extends Controller
         $review->save();
 
         // Update the food spot's average rating
-        $food_spot = $review->foodSpot;
         $food_spot->rating = $food_spot->getAverageRatingAttribute();
         $food_spot->save();
 
-        return response()->json($review);
+        return response()->json($review, 200);
+    }
+
+    /**
+     * Get the average rating for a food spot.
+     */
+    public function averageRating(FoodSpot $food_spot)
+    {
+        return response()->json([
+            'message' => 'Average rating retrieved successfully',
+            'data' => [
+                'food_spot_id' => $food_spot->id,
+                'name' => $food_spot->name,
+                'average_rating' => $food_spot->getAverageRatingAttribute(),
+                'review_count' => $food_spot->reviews()->where('is_approved', true)->count(),
+            ]
+        ], 200);
     }
 }

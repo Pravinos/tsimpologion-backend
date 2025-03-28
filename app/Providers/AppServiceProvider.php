@@ -3,6 +3,7 @@ namespace App\Providers;
 
 use App\Models\FoodSpot;
 use App\Models\User;
+use App\Models\Review;
 use App\Policies\FoodSpotPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -17,6 +18,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         User::class => UserPolicy::class,
         FoodSpot::class => FoodSpotPolicy::class,
+        Review::class => ReviewPolicy::class,
     ];
 
     /**

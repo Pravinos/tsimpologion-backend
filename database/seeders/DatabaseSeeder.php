@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Database\Seeders\FoodSpotSeeder;
+use Database\Seeders\UserSeeder;
 use Database\Seeders\ReviewSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -16,14 +17,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             FoodSpotSeeder::class,
+            UserSeeder::class,
             ReviewSeeder::class,
-        ]);
-
-        User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@admin.com',
-            'password' => bcrypt('password'),
-            'role' => 'admin',
         ]);
     }
 }

@@ -13,7 +13,7 @@ class UpdateReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rating' => 'sometimes|integer|min:1|max:5',
+            'rating' => 'sometimes|numeric|min:1|max:5',
             'comment' => 'sometimes|string|min:3|max:500',
         ];
     }

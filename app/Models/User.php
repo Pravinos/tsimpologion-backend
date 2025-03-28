@@ -56,6 +56,14 @@ class User extends Authenticatable
         return $this->hasMany(FoodSpot::class, 'owner_id');
     }
 
+    /**
+     * Get the reviews written by the user.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
      /**
      * Check if user is an admin.
      */

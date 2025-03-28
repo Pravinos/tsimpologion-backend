@@ -90,6 +90,6 @@ class FoodSpotController extends Controller
 
         $food_spot->forceDelete();
 
-        return response()->json(['message' => 'Food spot permanently deleted'], 200);
+        return response()->json(['message' => 'OK'], 200);
     }
 }

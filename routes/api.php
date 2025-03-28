@@ -4,12 +4,13 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\ReviewController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/food-spots', [FoodSpotController::class, 'index']);
-Route::get('/reviews/{review}', [ReviewController::class, 'show']);
+Route::get('/food-spots/{food_spot}/rating', [ReviewController::class, 'averageRating']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -24,10 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/food-spots/{id}/force', [FoodSpotController::class, 'forceDelete']);
 
     // Review routes
-     Route::post('/food-spots/{foodSpot}/reviews', [ReviewController::class, 'store']);
-     Route::put('/reviews/{review}', [ReviewController::class, 'update']);
-     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy']);
+    Route::apiResource('food-spots.reviews', ReviewController::class);
+    Route::put('/food-spots/{food_spot}/reviews/{review}/moderate', [ReviewController::class, 'moderate']);
 
-    // Admin-only route
-    Route::put('/reviews/{review}/moderate', [ReviewController::class, 'moderate']);
 });
