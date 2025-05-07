@@ -41,7 +41,7 @@ To run this backend locally or deploy it, ensure you have the following installe
 
 ### Start the Server
 - Start Laravel's built-in server:
-  - php artisan serve
+  - php artisan serve --host=0.0.0.0 --port=8000
 - The API will be available at http://localhost:8000.
 
 ## Features
