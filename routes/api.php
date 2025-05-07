@@ -14,6 +14,8 @@ Route::get('/food-spots', [FoodSpotController::class, 'index']);
 Route::get('/food-spots/{food_spot}/rating', [ReviewController::class, 'averageRating']);
 Route::get('/images/{model_type}/{id}', [ImageController::class, 'viewAll']);
 Route::get('/images/{model_type}/{id}/{image_id}', [ImageController::class, 'viewOne']);
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
+Route::post('/email/verification-notification', [AuthController::class, 'resendVerification'])->middleware(['throttle:6,1'])->name('verification.send');
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
