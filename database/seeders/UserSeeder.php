@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class UserSeeder extends Seeder
 {
@@ -19,6 +20,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => bcrypt('password'),
             'role' => 'admin',
+            'email_verified_at' => Carbon::now()
         ]);
 
         // Create 2 spot owners

@@ -25,7 +25,21 @@ class RegisterRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'required|string',
+            'role' => 'sometimes|string|in:admin,spot_owner,foodie',
         ];
+    }
+
+     /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        if (!$this->has('role')) {
+            $this->merge([
+                'role' => 'foodie',
+            ]);
+        }
     }
 }

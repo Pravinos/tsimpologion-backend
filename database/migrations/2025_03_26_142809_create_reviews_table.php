@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('food_spot_id')->constrained()->onDelete('cascade');
             $table->text('comment');
             $table->integer('rating')->unsigned()->min(1)->max(5);
+            $table->json('images')->nullable();
             $table->boolean('is_approved')->default(true);
             $table->timestamps();
             $table->softDeletes();

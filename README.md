@@ -27,6 +27,14 @@ To run this backend locally or deploy it, ensure you have the following installe
 - Edit the .env file with your database credentials:
   - DB_CONNECTION=sqlite
   - DB_DATABASE=tsimpologion_db
+- Set up mail configuration for email verification:
+  - MAIL_MAILER=smtp
+  - MAIL_HOST=your_mail_host
+  - MAIL_PORT=your_mail_port
+  - MAIL_USERNAME=your_mail_username
+  - MAIL_PASSWORD=your_mail_password
+  - MAIL_FROM_ADDRESS=your_from_address
+  - MAIL_FROM_NAME="${APP_NAME}"
 - Generate an application key:
   - php artisan key:generate
 
@@ -41,13 +49,14 @@ To run this backend locally or deploy it, ensure you have the following installe
 
 ### Start the Server
 - Start Laravel's built-in server:
-  - php artisan serve
+  - php artisan serve --host=0.0.0.0 --port=8000
 - The API will be available at http://localhost:8000.
 
 ## Features
 
 ### Authentication & Authorization
 - **User Authentication**: Users can register, log in, and log out using Laravel Sanctum, which supports both session-based and token-based authentication.
+- **Email Verification**: New users receive a verification email and must verify their email address before accessing the application.
 - **API Token Management**: Sanctum is configured for token expiration and prefixing to enhance security.
 - **User Policies**: User-related operations are secured via policies (see UserPolicy.php). For example, only administrators or the user themselves can update or delete a user record.
 - **Resource Policies**: Custom policies (e.g., FoodSpotPolicy in FoodSpotPolicy.php) control resource access, allowing administrators and food spot owners to manage food spots.
@@ -65,12 +74,21 @@ To run this backend locally or deploy it, ensure you have the following installe
 - **Average Ratings**: Food spots display an aggregated average rating from all approved reviews.
 - **One Review Per User**: Users are limited to one review per food spot.
 
+### Image Management
+- **Image Upload**: Users can upload images for food spots and user profiles.
+- **Multiple Image Support**: Each model can have multiple associated images.
+- **Image Deletion**: Authorized users can delete images they've uploaded.
+- **Public Image Access**: Anyone can view images associated with public resources.
+- **Permission Management**: Images can only be managed by the resource owner or administrators.
+
 ## API Endpoints
 
 ### Authentication Endpoints
-- **POST /api/register** – Register a new user
+- **POST /api/register** – Register a new user and trigger verification email
 - **POST /api/login** – Log in and retrieve an authentication token
 - **POST /api/logout** – Invalidate the current token (requires authentication)
+- **GET /api/email/verify/{id}/{hash}** – Verify user email with verification link
+- **POST /api/email/verification-notification** – Resend verification email
 
 ### User Endpoints
 - **GET /api/users** – Retrieve a list of users (admin sees all; non-admins see limited results)
@@ -100,6 +118,12 @@ To run this backend locally or deploy it, ensure you have the following installe
 - **DELETE /api/food-spots/{food_spot}/reviews/{review}** – Delete a review (auth required, owner or admin)
 - **PUT /api/food-spots/{food_spot}/reviews/{review}/moderate** – Moderate a review (admin only)
 
+### Image Management Endpoints
+- **GET /api/images/{model_type}/{id}** – View all images for a specific resource
+- **GET /api/images/{model_type}/{id}/{image_id}** – View a specific image
+- **POST /api/images/{model_type}/{id}** – Upload images to a resource (auth required)
+- **DELETE /api/images/{model_type}/{id}/{image_id}** – Delete an image (auth required, owner or admin)
+
 ## Database Schema
 
 ### Food Spots Table
@@ -114,6 +138,7 @@ To run this backend locally or deploy it, ensure you have the following installe
 | info_link    | VARCHAR(255) | Google Maps share link         | "https://maps.app.goo.gl/xyz" |
 | rating       | FLOAT        | Calculated average rating      | 4.7                           |
 | owner_id     | BIGINT       | Foreign key to user who owns the spot | 2                      |
+| images       | JSON         | Stored images metadata         | JSON array of image objects   |
 | created_at   | TIMESTAMP    | Record creation time           | 2025-03-25 10:00:00           |
 | updated_at   | TIMESTAMP    | Record update time             | 2025-03-25 10:00:00           |
 | deleted_at   | TIMESTAMP    | Soft delete timestamp          | NULL                          |
@@ -126,6 +151,8 @@ To run this backend locally or deploy it, ensure you have the following installe
 | email        | VARCHAR(255) | User's email (unique)          | "admin@example.com"           |
 | password     | VARCHAR(255) | Hashed password                | "$2y$10$92IXUNpkjO0..."      |
 | role         | VARCHAR(255) | User role                      | "admin"                       |
+| images       | JSON         | Stored profile images          | JSON array of image objects   |
+| email_verified_at | TIMESTAMP | Email verification timestamp | "2025-03-25 10:00:00"        |
 | created_at   | TIMESTAMP    | Record creation time           | 2025-03-25 10:00:00           |
 | updated_at   | TIMESTAMP    | Record update time             | 2025-03-25 10:00:00           |
 
@@ -138,6 +165,7 @@ To run this backend locally or deploy it, ensure you have the following installe
 | comment      | TEXT         | Review comment                 | "Great food and atmosphere!"  |
 | rating       | INTEGER      | User rating (1-5)              | 5                             |
 | is_approved  | BOOLEAN      | Moderation status              | true                          |
+| images       | JSON         | Images attached to review      | JSON array of image objects   |
 | created_at   | TIMESTAMP    | Record creation time           | 2025-03-25 10:00:00           |
 | updated_at   | TIMESTAMP    | Record update time             | 2025-03-25 10:00:00           |
 | deleted_at   | TIMESTAMP    | Soft delete timestamp          | NULL                          |
@@ -148,14 +176,30 @@ To run this backend locally or deploy it, ensure you have the following installe
 - **ReviewPolicy**: Controls who can create, update, delete, and moderate reviews. Users can only edit their own reviews, while admins can moderate and delete any review.
 - **AuthServiceProvider**: Maps models to policies, ensuring every request is authorized according to defined rules.
 
+## Email Verification System
+- **Automatic Verification**: Upon registration, a verification email is automatically sent to new users.
+- **Secure Tokens**: Uses secure, time-limited tokens for email verification.
+- **Re-sending Option**: Users can request a new verification email if needed.
+- **Required Verification**: Email verification is required before users can fully access the application.
+- **Admin Override**: Admin accounts created via seeders are automatically verified.
+
+## Image Management System
+- **Multi-Model Support**: The image system works with Users, FoodSpots, and Reviews.
+- **JSON Storage**: Images are stored as JSON metadata in the respective model tables.
+- **Secure Access Control**: Each model implements userCanManageImages() to control permissions.
+- **Efficient Storage**: Images are stored using unique identifiers to prevent collisions.
+- **Public Access**: Public images can be viewed without authentication.
+
 ## API Endpoints Summary
 
 ### Authentication
 | Method | Endpoint         | Description                   |
 |--------|------------------|-------------------------------|
-| POST   | /api/register    | Register a new user           |
+| POST   | /api/register    | Register a new user and trigger verification email |
 | POST   | /api/login       | Log in and retrieve an auth token |
 | POST   | /api/logout      | Log out (invalidate token)    |
+| GET    | /api/email/verify/{id}/{hash} | Verify user email |
+| POST   | /api/email/verification-notification | Resend verification email |
 
 ### User Resources
 | Method | Endpoint         | Description                   |
@@ -187,10 +231,21 @@ To run this backend locally or deploy it, ensure you have the following installe
 | DELETE | /api/food-spots/{id}/reviews/{review_id} | Delete a review (owner or admin) |
 | PUT    | /api/food-spots/{id}/reviews/{review_id}/moderate | Moderate a review (admin only) |
 
+### Image Resources
+| Method | Endpoint                           | Description                   |
+|--------|------------------------------------|-------------------------------|
+| GET    | /api/images/{model_type}/{id}      | Get all images for a resource |
+| GET    | /api/images/{model_type}/{id}/{image_id} | Get a specific image   |
+| POST   | /api/images/{model_type}/{id}      | Upload images (protected)     |
+| DELETE | /api/images/{model_type}/{id}/{image_id} | Delete an image (protected) |
+
 ## Usage
 
 ### Local Testing
 - After starting the server with php artisan serve, use Postman or a browser to test endpoints, e.g., http://localhost:8000/api/food-spots.
+
+### Email Testing
+- For testing email verification locally, use Mailtrap or configure the mail driver to 'log' in your .env file.
 
 ### Data Updates
 - For this MVP, data is static. To update food spot data, edit FoodSpotSeeder.php and run:
@@ -201,6 +256,7 @@ To run this backend locally or deploy it, ensure you have the following installe
 - Integrate dynamic data sources (e.g., Google Places API).
 - Implement filters for food spots (e.g., by cuisine type or location).
 - Enhance error handling and logging mechanisms.
+- Add image resizing and optimization features.
 
 ## License
 This project is for portfolio purposes and is not currently licensed for public distribution.

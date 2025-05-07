@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('info_link');
             $table->float('rating')->nullable();
             $table->unsignedBigInteger('owner_id')->nullable();
+            $table->json('images')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
