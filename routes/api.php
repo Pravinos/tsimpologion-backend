@@ -20,9 +20,13 @@ Route::post('/email/verification-notification', [AuthController::class, 'resendV
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 
     // User routes
     Route::apiResource('users', UserController::class);
+    Route::get('/users/{user}/reviews', [UserController::class, 'reviews']); // Add this line
 
     // Food spot routes
     Route::apiResource('food-spots', FoodSpotController::class)->except(['index']);
