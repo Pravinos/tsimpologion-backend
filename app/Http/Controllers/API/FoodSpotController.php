@@ -138,16 +138,29 @@ class FoodSpotController extends Controller
             $nominatim['lat'],
             $nominatim['lon']
         );
+
+        // Compose city with normalization and fallback
+        $city = $nominatim['address']['city']
+            ?? $nominatim['address']['town']
+            ?? $nominatim['address']['village']
+            ?? $nominatim['address']['municipality']
+            ?? $nominatim['address']['state']
+            ?? null;
+
         $food_spot = FoodSpot::create([
             'name' => $nominatim['name'] ?? ($nominatim['display_name'] ?? $validated['q']),
-            'category' => ucfirst($nominatim['type'] ?? 'Restaurant'),
-            'city' => $nominatim['address']['city'] ?? null,
+            'category' => ucfirst(str_replace('_', ' ', $nominatim['type'] ?? 'Restaurant')),
+            'city' => $city,
             'address' => $address,
             'description' => null,
             'info_link' => $info_link,
             'rating' => null,
             'owner_id' => null,
             'images' => null,
+            'phone' => null,
+            'business_hours' => null,
+            'social_links' => null,
+            'price_range' => null,
         ]);
 
         return response()->json($food_spot, 201);

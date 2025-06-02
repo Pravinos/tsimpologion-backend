@@ -19,11 +19,15 @@ return new class extends Migration
             $table->string('address');
             $table->text('description')->nullable();
             $table->string('info_link');
-            $table->float('rating')->nullable();
+            $table->decimal('rating', 3, 1)->nullable();
             $table->unsignedBigInteger('owner_id')->nullable();
             $table->json('images')->nullable();
             $table->softDeletes();
             $table->timestamps();
+            $table->string('phone')->nullable();
+            $table->json('business_hours')->nullable();
+            $table->json('social_links')->nullable();
+            $table->string('price_range', 10)->nullable();
         });
     }
 

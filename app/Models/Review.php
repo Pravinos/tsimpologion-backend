@@ -11,7 +11,7 @@ use App\Traits\HasImages;
 
 class Review extends Model
 {
-    use HasFactory, SoftDeletes, HasImages;
+    use HasFactory, HasImages;
 
     protected $fillable = [
         'food_spot_id',

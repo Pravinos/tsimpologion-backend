@@ -28,6 +28,10 @@ class FoodSpot extends Model
         'rating',
         'owner_id',
         'images',
+        'phone',
+        'business_hours',
+        'social_links',
+        'price_range',
     ];
 
     /**
@@ -38,6 +42,8 @@ class FoodSpot extends Model
     protected $casts = [
         'rating' => 'float',
         'images' => 'array',
+        'business_hours' => 'array',
+        'social_links' => 'array',
     ];
 
      /**
