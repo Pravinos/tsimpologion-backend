@@ -40,4 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Image routes
     Route::post('/images/{modelType}/{id}', [ImageController::class, 'upload']);
     Route::delete('/images/{model_type}/{id}/{image_id}', [ImageController::class, 'delete']);
+
+    // Nominatim search endpoint
+    Route::match(['get', 'post'], '/nominatim/search', [FoodSpotController::class, 'searchNominatim']);
+    Route::post('/food-spots/from-nominatim', [FoodSpotController::class, 'createFromNominatim']);
 });

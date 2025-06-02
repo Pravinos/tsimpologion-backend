@@ -6,6 +6,7 @@ use App\Models\FoodSpot;
 use App\Http\Requests\StoreFoodSpotRequest;
 use App\Http\Requests\UpdateFoodSpotRequest;
 use Illuminate\Http\Request;
+use App\Services\NominatimService;
 
 class FoodSpotController extends Controller
 {
@@ -91,5 +92,64 @@ class FoodSpotController extends Controller
         $food_spot->forceDelete();
 
         return response()->json(['message' => 'OK'], 200);
+    }
+
+    /**
+     * Search for food spots using Nominatim API.
+     */
+    public function searchNominatim(Request $request, NominatimService $nominatimService)
+    {
+        $request->validate([
+            'q' => 'required|string',
+        ]);
+        $results = $nominatimService->search($request->input('q'));
+        return response()->json($results);
+    }
+
+    /**
+     * Create a food spot from Nominatim API response.
+     */
+    public function createFromNominatim(Request $request, NominatimService $nominatimService)
+    {
+        $validated = $request->validate([
+            'q' => 'required|string',
+        ]);
+        $results = $nominatimService->search($validated['q']);
+        if (empty($results) || !isset($results[0])) {
+            return response()->json(['error' => 'No results found from Nominatim.'], 404);
+        }
+        $nominatim = $results[0];
+        // Compose address
+        $addressParts = [];
+        if (!empty($nominatim['address']['road'] ?? null)) {
+            $addressParts[] = $nominatim['address']['road'];
+        }
+        if (!empty($nominatim['address']['house_number'] ?? null)) {
+            $addressParts[] = $nominatim['address']['house_number'];
+        }
+        if (!empty($nominatim['address']['postcode'] ?? null)) {
+            $addressParts[] = $nominatim['address']['postcode'];
+        }
+        $address = implode(', ', $addressParts);
+        $info_link = sprintf(
+            'https://www.openstreetmap.org/?mlat=%s&mlon=%s#map=19/%s/%s',
+            $nominatim['lat'],
+            $nominatim['lon'],
+            $nominatim['lat'],
+            $nominatim['lon']
+        );
+        $food_spot = FoodSpot::create([
+            'name' => $nominatim['name'] ?? ($nominatim['display_name'] ?? $validated['q']),
+            'category' => ucfirst($nominatim['type'] ?? 'Restaurant'),
+            'city' => $nominatim['address']['city'] ?? null,
+            'address' => $address,
+            'description' => null,
+            'info_link' => $info_link,
+            'rating' => null,
+            'owner_id' => null,
+            'images' => null,
+        ]);
+
+        return response()->json($food_spot, 201);
     }
 }
