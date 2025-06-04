@@ -4,15 +4,19 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreReviewRequest;
 use App\Http\Requests\UpdateReviewRequest;
+use App\Services\ImageService;
 use App\Models\FoodSpot;
 use App\Models\Review;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    public function __construct()
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
     {
         $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->imageService = $imageService;
     }
 
     /**
@@ -44,11 +48,13 @@ class ReviewController extends Controller
             ], 422);
         }
 
+        $validated = $request->validated();
+
         $review = Review::create([
             'food_spot_id' => $food_spot->id,
             'user_id' => auth()->id(),
-            'rating' => $request->rating,
-            'comment' => $request->comment,
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'],
         ]);
 
         // Update the food spot's average rating
@@ -106,6 +112,15 @@ class ReviewController extends Controller
 
         // Authorize the action
         $this->authorize('delete', $review);
+
+        // Delete all images associated with the review
+        if (!empty($review->images) && is_array($review->images)) {
+            foreach ($review->images as $image) {
+                if (isset($image['id'])) {
+                    $this->imageService->deleteImage($review, $image['id']);
+                }
+            }
+        }
 
         $review->delete();
 
