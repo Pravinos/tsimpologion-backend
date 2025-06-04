@@ -25,7 +25,7 @@ class ImageController extends Controller
         // Validate input
         $request->validate([
             'images' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048'
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:8000'
         ]);
 
         // Get model
