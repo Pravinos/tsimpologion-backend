@@ -70,9 +70,17 @@ class FoodSpot extends Model
         return $this->reviews()->where('is_approved', true)->avg('rating') ?? 0;
     }
 
-     // If needed, override the method
-     public function getImageFolder(): string
-     {
-         return 'food-spots';
-     }
+    /**
+     * The users who have favourited this food spot.
+     */
+    public function favouritedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'favourites')->withTimestamps();
+    }
+
+    // If needed, override the method
+    public function getImageFolder(): string
+    {
+        return 'food-spots';
+    }
 }

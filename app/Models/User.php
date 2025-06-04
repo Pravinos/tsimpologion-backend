@@ -52,12 +52,21 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+
     /**
      * Get the food spots owned by the user.
      */
     public function foodSpots(): HasMany
     {
         return $this->hasMany(FoodSpot::class, 'owner_id');
+    }
+
+    /**
+     * The food spots this user has favourited.
+     */
+    public function favouriteFoodSpots()
+    {
+        return $this->belongsToMany(FoodSpot::class, 'favourites')->withTimestamps();
     }
 
     /**

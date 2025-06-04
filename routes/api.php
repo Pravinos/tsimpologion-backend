@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\ImageController;
+use App\Http\Controllers\API\FavouriteController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -44,4 +45,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Nominatim search endpoint
     Route::match(['get', 'post'], '/nominatim/search', [FoodSpotController::class, 'searchNominatim']);
     Route::post('/food-spots/from-nominatim', [FoodSpotController::class, 'createFromNominatim']);
+
+    // Favourites routes
+    Route::get('/favourites', [\App\Http\Controllers\API\FavouriteController::class, 'index']);
+    Route::post('/food-spots/{foodSpotId}/favourite', [\App\Http\Controllers\API\FavouriteController::class, 'store']);
+    Route::delete('/food-spots/{foodSpotId}/favourite', [\App\Http\Controllers\API\FavouriteController::class, 'destroy']);
 });
