@@ -33,7 +33,7 @@
 								},
 								{
 									"key": "email",
-									"value": "tompravi@gmail.com",
+									"value": "tompravi99@gmail.com",
 									"type": "text"
 								},
 								{
@@ -44,7 +44,8 @@
 								{
 									"key": "role",
 									"value": "foodie",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								}
 							]
 						},
@@ -120,13 +121,13 @@
 							]
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/login",
+							"raw": "http://192.168.1.162:8000/api/login",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"192",
+								"168",
+								"1",
+								"162"
 							],
 							"port": "8000",
 							"path": [
@@ -155,6 +156,29 @@
 							"path": [
 								"api",
 								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://192.168.1.7:8000/api/user",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"1",
+								"7"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user"
 							]
 						}
 					},
@@ -588,6 +612,60 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Search on Nominatim",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/nominatim/search?q=δυο γουρουνακια Thessaloniki",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"nominatim",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "δυο γουρουνακια Thessaloniki"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Food Spot from Nominatim API",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/nominatim/search?q=δυο γουρουνακια Thessaloniki",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"nominatim",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "δυο γουρουνακια Thessaloniki"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -767,6 +845,31 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get User Reviews",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://192.168.1.7:8000/api/users/1/reviews",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"1",
+								"7"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"1",
+								"reviews"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -858,6 +961,113 @@
 								"users",
 								"1",
 								"1sxrOba3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload image on review",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "images[]",
+									"type": "file",
+									"src": "/C:/Users/tprav/Pictures/Screenshots/Screenshot 2025-03-26 004410.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/images/reviews/8",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"images",
+								"reviews",
+								"8"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Favourites",
+			"item": [
+				{
+					"name": "Make a place favourite",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/food-spots/1/favourite",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"food-spots",
+								"1",
+								"favourite"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove place from favourites",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/food-spots/1/favourite",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"food-spots",
+								"1",
+								"favourite"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Favourites",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/favourites",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"favourites"
 							]
 						}
 					},
