@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Traits\HasImages;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -105,5 +106,13 @@ class User extends Authenticatable implements MustVerifyEmail
      public function userCanManageImages($user): bool
      {
          return $user->id === $this->id || $user->isAdmin();
+     }
+
+     /**
+      * Get the review likes by the user.
+      */
+     public function reviewLikes(): HasMany
+     {
+         return $this->hasMany(ReviewLike::class);
      }
 }

@@ -22,12 +22,49 @@ class ReviewController extends Controller
     /**
      * Get reviews for a specific food spot.
      */
-    public function index(FoodSpot $food_spot)
+    public function index(Request $request, FoodSpot $food_spot)
     {
-        $reviews = $food_spot->reviews()
+        $query = $food_spot->reviews()
             ->where('is_approved', true)
             ->with('user:id,name')
-            ->get();
+            ->withCount('likes');
+
+        // Apply sorting based on request
+        if ($request->has('sort')) {
+            switch ($request->sort) {
+                case 'most_liked':
+                    $query->orderBy('likes_count', 'desc');
+                    break;
+                case 'recent':
+                default:
+                    $query->orderBy('created_at', 'desc');
+                    break;
+            }
+        } else {
+            // Default sorting by most recent
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $reviews = $query->get();
+
+        // Append is_liked field if user is authenticated
+        if (auth()->check()) {
+            $userId = auth()->id();
+            
+            // Get all review IDs to check in a single query
+            $reviewIds = $reviews->pluck('id')->toArray();
+            
+            // Get all likes for these reviews by this user in a single query
+            $userLikes = \App\Models\ReviewLike::where('user_id', $userId)
+                ->whereIn('review_id', $reviewIds)
+                ->pluck('review_id')
+                ->toArray();
+            
+            // Mark reviews as liked based on the bulk query results
+            $reviews->each(function ($review) use ($userLikes) {
+                $review->is_liked = in_array($review->id, $userLikes);
+            });
+        }
 
         return response()->json($reviews, 200);
     }
@@ -72,9 +109,17 @@ class ReviewController extends Controller
         // Verify the review belongs to this food spot
         if ($review->food_spot_id !== $food_spot->id) {
             return response()->json(['message' => 'Review not found for this food spot'], 404);
+        }        $review->load('user:id,name');
+        $review->loadCount('likes');
+        
+        // Add is_liked field if user is authenticated
+        if (auth()->check()) {
+            $userId = auth()->id();
+            $review->is_liked = \App\Models\ReviewLike::where('user_id', $userId)
+                ->where('review_id', $review->id)
+                ->exists();
         }
 
-        $review->load('user:id,name');
         return response()->json($review, 200);
     }
 

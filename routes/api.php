@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\ImageController;
 use App\Http\Controllers\API\FavouriteController;
+use App\Http\Controllers\API\ReviewLikeController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -50,4 +51,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/favourites', [\App\Http\Controllers\API\FavouriteController::class, 'index']);
     Route::post('/food-spots/{foodSpotId}/favourite', [\App\Http\Controllers\API\FavouriteController::class, 'store']);
     Route::delete('/food-spots/{foodSpotId}/favourite', [\App\Http\Controllers\API\FavouriteController::class, 'destroy']);
+
+    // Review likes routes
+    Route::post('/reviews/{review}/like', [ReviewLikeController::class, 'toggle']);
+    Route::get('/reviews/{review}/like', [ReviewLikeController::class, 'check']);
+    Route::get('/reviews/{review}/likes/users', [ReviewLikeController::class, 'users']);
+    Route::post('/reviews/likes/bulk-check', [ReviewLikeController::class, 'bulkCheck']);
 });

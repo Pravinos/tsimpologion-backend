@@ -123,6 +123,7 @@ To run this backend locally or deploy it, ensure you have the following installe
 - **Moderation**: Admin users can moderate reviews by approving or disapproving them using the `is_approved` field and the `/moderate` endpoint. Only approved reviews are shown publicly.
 - **Review Images**: Users can attach images to their reviews. Only review authors or admins can manage review images.
 - **Average Ratings**: Food spots display an aggregated average rating from all approved reviews.
+- **Review Likes**: Users can like reviews from other users. The review listing can be filtered by recent or most liked reviews.
 
 ### Image Management
 - **Image Upload**: Users can upload images for food spots and user profiles.
@@ -162,11 +163,19 @@ To run this backend locally or deploy it, ensure you have the following installe
 
 ### Review Endpoints
 - **GET /api/food-spots/{food_spot}/reviews** – Get all reviews for a food spot
+- **GET /api/food-spots/{food_spot}/reviews?sort=recent** – Get reviews sorted by most recent
+- **GET /api/food-spots/{food_spot}/reviews?sort=most_liked** – Get reviews sorted by most liked
 - **GET /api/food-spots/{food_spot}/reviews/{review}** – Get details of a specific review
 - **POST /api/food-spots/{food_spot}/reviews** – Create a new review (auth required)
 - **PUT /api/food-spots/{food_spot}/reviews/{review}** – Update a review (auth required, owner only)
 - **DELETE /api/food-spots/{food_spot}/reviews/{review}** – Delete a review (auth required, owner or admin)
 - **PUT /api/food-spots/{food_spot}/reviews/{review}/moderate** – Moderate a review (admin only)
+
+### Review Like Endpoints
+- **POST /api/reviews/{review}/like** – Toggle like/unlike for a review (auth required)
+- **GET /api/reviews/{review}/like** – Check if the current user has liked a review (auth required)
+- **GET /api/reviews/{review}/likes/users** – Get users who liked a review (auth required)
+- **POST /api/reviews/likes/bulk-check** – Efficiently check like status for multiple reviews in a single call
 
 ### Image Management Endpoints
 - **GET /api/images/{model_type}/{id}** – View all images for a specific resource
@@ -226,6 +235,17 @@ To run this backend locally or deploy it, ensure you have the following installe
 
 **Unique Constraint:** Each user can only leave one review per food spot.
 
+### Review Likes Table
+| Column       | Type         | Description                    | Example Value                  |
+|--------------|--------------|--------------------------------|-------------------------------|
+| id           | BIGINT (PK)  | Auto-incrementing primary key  | 1                             |
+| user_id      | BIGINT (FK)  | Foreign key to user who liked  | 3                             |
+| review_id    | BIGINT (FK)  | Foreign key to review          | 5                             |
+| created_at   | TIMESTAMP    | When the like was created      | 2025-06-14 10:00:00           |
+| updated_at   | TIMESTAMP    | When the like was updated      | 2025-06-14 10:00:00           |
+
+**Unique Constraint:** Each user can only like a specific review once.
+
 ## Policies & Authorization
 - **UserPolicy**: Controls actions for viewing, creating, updating, and deleting user resources. Users can update or delete their own data or, if they are administrators, any user resource.
 - **FoodSpotPolicy**: Governs access to food spot actions. Administrators and spot owners have extended permissions while public users can only view food spot information.
@@ -284,11 +304,21 @@ To run this backend locally or deploy it, ensure you have the following installe
 | Method | Endpoint                           | Description                   |
 |--------|------------------------------------|-------------------------------|
 | GET    | /api/food-spots/{id}/reviews       | List all reviews for a food spot |
+| GET    | /api/food-spots/{id}/reviews?sort=recent | List reviews sorted by most recent |
+| GET    | /api/food-spots/{id}/reviews?sort=most_liked | List reviews sorted by most liked |
 | GET    | /api/food-spots/{id}/reviews/{review_id} | Get a specific review   |
 | POST   | /api/food-spots/{id}/reviews       | Add a review to a food spot (authenticated) |
 | PUT    | /api/food-spots/{id}/reviews/{review_id} | Update a review (owner only) |
 | DELETE | /api/food-spots/{id}/reviews/{review_id} | Delete a review (owner or admin) |
 | PUT    | /api/food-spots/{id}/reviews/{review_id}/moderate | Moderate a review (admin only) |
+
+### Review Likes Resources
+| Method | Endpoint                           | Description                   |
+|--------|------------------------------------|-------------------------------|
+| POST   | /api/reviews/{review}/like         | Toggle like/unlike for a review (authenticated) |
+| GET    | /api/reviews/{review}/like         | Check if current user has liked a review |
+| GET    | /api/reviews/{review}/likes/users  | Get users who liked a review |
+| POST   | /api/reviews/likes/bulk-check      | Bulk check like status for multiple reviews (efficient) |
 
 ### Image Resources
 | Method | Endpoint                           | Description                   |
@@ -316,6 +346,7 @@ To run this backend locally or deploy it, ensure you have the following installe
 - Implement filters for food spots (e.g., by cuisine type or location).
 - Enhance error handling and logging mechanisms.
 - Add image resizing and optimization features.
+- Implement review comment functionality with threaded replies.
 
 ## License
 This project is for portfolio purposes and is not currently licensed for public distribution.
