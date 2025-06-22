@@ -7,6 +7,7 @@ use App\Http\Requests\StoreFoodSpotRequest;
 use App\Http\Requests\UpdateFoodSpotRequest;
 use Illuminate\Http\Request;
 use App\Services\NominatimService;
+use App\Models\User;
 
 class FoodSpotController extends Controller
 {
@@ -21,6 +22,15 @@ class FoodSpotController extends Controller
     public function index()
     {
         return response()->json(FoodSpot::all(), 200);
+    }
+
+    /**
+     * Display a listing of the resource for a given user.
+     */
+    public function userFoodSpots(User $user)
+    {
+        $foodSpots = FoodSpot::where('owner_id', $user->id)->get();
+        return response()->json($foodSpots, 200);
     }
 
     /**

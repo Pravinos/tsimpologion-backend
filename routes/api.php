@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // User routes
     Route::apiResource('users', UserController::class);
     Route::get('/users/{user}/reviews', [UserController::class, 'reviews']); // Add this line
+    Route::get('/users/{user}/food-spots', [FoodSpotController::class, 'userFoodSpots']);
 
     // Food spot routes
     Route::apiResource('food-spots', FoodSpotController::class)->except(['index']);
