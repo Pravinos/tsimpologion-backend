@@ -11,7 +11,7 @@ use App\Traits\HasImages;
 
 class FoodSpot extends Model
 {
-    use HasFactory, SoftDeletes, HasImages;
+    use HasFactory, HasImages;
 
     /**
      * The attributes that are mass assignable.

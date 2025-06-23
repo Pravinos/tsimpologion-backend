@@ -31,7 +31,7 @@ class FoodSpotSeeder extends Seeder
                     'instagram' => 'https://https://www.instagram.com/relanti_mezedopwleion/',
                     'tik tok' => 'https://www.tiktok.com/@relantimezedopwleion'
                 ]),
-                'price_range' => '$$',
+                'price_range' => '€€',
             ],
             [
                 'name' => 'Πίτσα Σάκης',
@@ -48,7 +48,7 @@ class FoodSpotSeeder extends Seeder
                 'social_links' => json_encode([
                     'facebook' => 'https://facebook.com/pitsasakis',
                 ]),
-                'price_range' => '$',
+                'price_range' => '€',
             ],
             [
                 'name' => 'Μπαχτσές',
@@ -66,7 +66,7 @@ class FoodSpotSeeder extends Seeder
                 'social_links' => json_encode([
                     'instagram' => 'https://instagram.com/mpaxtsesthessaloniki',
                 ]),
-                'price_range' => '$$',
+                'price_range' => '€€',
             ],
             [
                 'name' => 'Ραλεντάντο',
@@ -83,7 +83,7 @@ class FoodSpotSeeder extends Seeder
                 'social_links' => json_encode([
                     'facebook' => 'https://facebook.com/ralentanto',
                 ]),
-                'price_range' => '$',
+                'price_range' => '€',
             ],
         ];
 

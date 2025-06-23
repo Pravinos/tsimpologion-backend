@@ -24,7 +24,7 @@ class UpdateFoodSpotRequest extends FormRequest
             'phone' => 'sometimes|nullable|string|max:30',
             'business_hours' => 'sometimes|nullable|array',
             'social_links' => 'sometimes|nullable|array',
-            'price_range' => 'sometimes|nullable|string|in:$,$$,$$$,$$$$',
+            'price_range' => 'sometimes|nullable|string|in:€,€€,€€€,€€€€',
         ];
     }
 }
