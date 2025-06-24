@@ -25,10 +25,11 @@ class UserSeeder extends Seeder
 
         // Create 2 spot owners
         User::create([
-            'name' => 'George Papadopoulos',
-            'email' => 'george.p@example.com',
+            'name' => 'Thomas Afentiko',
+            'email' => 'afentiko@example.com',
             'password' => bcrypt('password'),
             'role' => 'spot_owner',
+            'email_verified_at' => Carbon::now()
         ]);
 
         User::create([

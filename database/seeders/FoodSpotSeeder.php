@@ -41,6 +41,7 @@ class FoodSpotSeeder extends Seeder
                 'description' => 'Pizzes kai pites olo to 24wro',
                 'info_link' => 'https://www.openstreetmap.org/?mlat=40.6189426&mlon=22.9580530#map=19/40.6189426/22.9580530',
                 'rating' => 4,
+                'owner_id' => 2,
                 'phone' => '+30 210 7654321',
                 'business_hours' => json_encode([
                     'mon-sun' => '00:00-23:59',
