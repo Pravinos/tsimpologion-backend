@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Database\Seeders\FoodSpotSeeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\ReviewSeeder;
+use Database\Seeders\ReviewLikeSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,6 +20,7 @@ class DatabaseSeeder extends Seeder
             FoodSpotSeeder::class,
             UserSeeder::class,
             ReviewSeeder::class,
+            ReviewLikeSeeder::class,
         ]);
     }
 }

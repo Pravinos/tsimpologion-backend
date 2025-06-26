@@ -6,21 +6,31 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Services\SupabaseStorageService;
 
 class ImageService
 {
+    protected $supabaseStorage;
+
+    public function __construct(SupabaseStorageService $supabaseStorage = null)
+    {
+        $this->supabaseStorage = $supabaseStorage ?? new SupabaseStorageService();
+    }
+
     /**
      * Upload images for a model.
      *
      * @param Model $model
      * @param array $images
      * @param string $folder
+     * @param string|null $disk
      * @return array
      */
-    public function uploadImages(Model $model, array $images, string $folder): array
+    public function uploadImages(Model $model, array $images, string $folder, ?string $disk = null): array
     {
         $uploaded_images = [];
         $existing_images = $model->images ?? [];
+        $disk = $disk ?? $this->getDefaultDisk();
 
         foreach ($images as $image) {
             if (!($image instanceof UploadedFile)) {
@@ -37,15 +47,55 @@ class ImageService
             $path = "{$folder}/{$model->id}/{$filename}";
 
             // Store the file
-            if (!Storage::disk('public')->put($path, file_get_contents($image))) {
+            try {
+                $uploadResult = null;
+                $success = false;
+
+                if ($disk === 'supabase') {
+                    // Use Supabase direct upload as primary method
+                    $uploadResult = $this->supabaseStorage->uploadFile($image, $path);
+                    $success = $uploadResult !== null;
+
+                    if (!$success) {
+                        // Only try the S3 adapter as a fallback if direct upload fails
+                        try {
+                            $success = Storage::disk($disk)->put($path, file_get_contents($image->getRealPath()));
+
+                            if ($success) {
+                                $uploadResult = [
+                                    'id' => Str::random(8),
+                                    'path' => $path,
+                                    'disk' => $disk,
+                                    'url' => $this->getImageUrl($path, $disk)
+                                ];
+                            }
+                        } catch (\Exception $e) {
+                            $success = false;
+                        }
+                    }
+                } else {
+                    // Use regular Laravel storage
+                    $success = Storage::disk($disk)->put($path, file_get_contents($image->getRealPath()));
+
+                    if ($success) {
+                        $uploadResult = [
+                            'id' => Str::random(8),
+                            'path' => $path,
+                            'disk' => $disk,
+                            'url' => $this->getImageUrl($path, $disk)
+                        ];
+                    }
+                }
+
+                // If not successful, skip
+                if (!$success) {
+                    continue;
+                }
+
+                $uploaded_images[] = $uploadResult;
+            } catch (\Exception $e) {
                 continue;
             }
-
-            $uploaded_images[] = [
-                'id' => Str::random(8), // Add a short ID for easier reference
-                'path' => $path,
-                'url' => asset('storage/' . $path)
-            ];
         }
 
         // Merge with existing images
@@ -69,12 +119,13 @@ class ImageService
     {
         $images = $model->images ?? [];
         $path_to_delete = null;
+        $disk_to_use = null;
 
         // Check if identifier is an ID or a path
         $is_path = Str::contains($identifier, '/');
 
         // Find and remove the image
-        $updated = array_values(array_filter($images, function($image) use ($identifier, $is_path, &$path_to_delete) {
+        $updated = array_values(array_filter($images, function($image) use ($identifier, $is_path, &$path_to_delete, &$disk_to_use) {
             // Match by ID (preferred) or by path
             $should_delete = ($is_path && isset($image['path']) && $image['path'] === $identifier) ||
                             (!$is_path && isset($image['id']) && $image['id'] === $identifier);
@@ -82,6 +133,8 @@ class ImageService
             if ($should_delete) {
                 // Store the path for deletion
                 $path_to_delete = $image['path'];
+                // Get the disk if available, fallback to default
+                $disk_to_use = $image['disk'] ?? $this->getDefaultDisk();
                 return false; // Remove from array
             }
             return true; // Keep in array
@@ -89,7 +142,9 @@ class ImageService
 
         // Delete the file and update model if an image was found
         if ($path_to_delete) {
-            Storage::disk('public')->delete($path_to_delete);
+            // Use regular Laravel storage for all disk types
+            Storage::disk($disk_to_use)->delete($path_to_delete);
+
             $model->images = $updated;
             $model->save();
             return true;
@@ -112,5 +167,39 @@ class ImageService
         }
 
         return null;
+    }
+
+    /**
+     * Get the default storage disk.
+     *
+     * @return string
+     */
+    public function getDefaultDisk(): string
+    {
+        return config('filesystems.default', 'supabase');
+    }
+
+    /**
+     * Get the URL for an image.
+     *
+     * @param string $path
+     * @param string $disk
+     * @return string
+     */
+    public function getImageUrl(string $path, string $disk): string
+    {
+        try {
+            if ($disk === 'public') {
+                return asset('storage/' . $path);
+            } else if ($disk === 'supabase') {
+                $supabaseUrl = env('SUPABASE_URL');
+                $bucket = env('SUPABASE_BUCKET', 'tsimpologion');
+                return "{$supabaseUrl}/storage/v1/object/public/{$bucket}/{$path}";
+            }
+
+            return Storage::disk($disk)->url($path);
+        } catch (\Exception $e) {
+            return '/storage/' . $path; // Fallback
+        }
     }
 }

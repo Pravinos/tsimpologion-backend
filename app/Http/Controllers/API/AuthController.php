@@ -20,7 +20,7 @@ class AuthController extends Controller
         $user = User::create($validated);
 
         // Trigger verification email
-        event(new Registered($user));
+        // event(new Registered($user));
 
         return response()->json([
             'message' => 'User registered successfully. Please check your email for verification link.'
@@ -39,12 +39,12 @@ class AuthController extends Controller
             $user = Auth::user();
 
             // Check if email is verified
-            if (!$user->hasVerifiedEmail()) {
-                return response()->json([
-                    'message' => 'Email not verified. Please check your email for verification link.',
-                    'verified' => false
-                ], 403);
-            }
+            // if (!$user->hasVerifiedEmail()) {
+            //     return response()->json([
+            //         'message' => 'Email not verified. Please check your email for verification link.',
+            //         'verified' => false
+            //     ], 403);
+            // }
 
             // Create token
             $token = $user->createToken('auth_token')->plainTextToken;

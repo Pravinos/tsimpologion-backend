@@ -14,7 +14,7 @@ class ImageController extends Controller
 
     public function __construct(ImageService $image_service)
     {
-        $this->imageService = $image_service;
+        $this->image_service = $image_service;
     }
 
     /**
@@ -25,7 +25,7 @@ class ImageController extends Controller
         // Validate input
         $request->validate([
             'images' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048'
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:8000'
         ]);
 
         // Get model
@@ -40,7 +40,7 @@ class ImageController extends Controller
         }
 
         // Upload images
-        $uploaded_images = $this->imageService->uploadImages(
+        $uploaded_images = $this->image_service->uploadImages(
             $model,
             $request->file('images'),
             $model->getImageFolder()
@@ -72,7 +72,7 @@ class ImageController extends Controller
         }
 
         // Delete image
-        $success = $this->imageService->deleteImage($model, $image_id);
+        $success = $this->image_service->deleteImage($model, $image_id);
 
         if ($success) {
             return response()->json([
@@ -128,7 +128,7 @@ class ImageController extends Controller
         }
 
         // Find the specific image
-        $image = $this->imageService->getImageById($model, $image_id);
+        $image = $this->image_service->getImageById($model, $image_id);
 
         if (!$image) {
             return response()->json([

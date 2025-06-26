@@ -11,7 +11,7 @@ use App\Traits\HasImages;
 
 class FoodSpot extends Model
 {
-    use HasFactory, SoftDeletes, HasImages;
+    use HasFactory, HasImages;
 
     /**
      * The attributes that are mass assignable.
@@ -28,6 +28,10 @@ class FoodSpot extends Model
         'rating',
         'owner_id',
         'images',
+        'phone',
+        'business_hours',
+        'social_links',
+        'price_range',
     ];
 
     /**
@@ -38,6 +42,8 @@ class FoodSpot extends Model
     protected $casts = [
         'rating' => 'float',
         'images' => 'array',
+        'business_hours' => 'array',
+        'social_links' => 'array',
     ];
 
      /**
@@ -64,9 +70,17 @@ class FoodSpot extends Model
         return $this->reviews()->where('is_approved', true)->avg('rating') ?? 0;
     }
 
-     // If needed, override the method
-     public function getImageFolder(): string
-     {
-         return 'food-spots';
-     }
+    /**
+     * The users who have favourited this food spot.
+     */
+    public function favouritedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'favourites')->withTimestamps();
+    }
+
+    // If needed, override the method
+    public function getImageFolder(): string
+    {
+        return 'food-spots';
+    }
 }

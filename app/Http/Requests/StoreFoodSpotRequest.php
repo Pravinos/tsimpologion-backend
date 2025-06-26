@@ -21,6 +21,10 @@ class StoreFoodSpotRequest extends FormRequest
             'info_link' => 'string|max:500',
             'rating' => 'nullable|numeric|min:0|max:5',
             'owner_id' => 'nullable|numeric',
+            'phone' => 'nullable|string|max:30',
+            'business_hours' => 'nullable|array',
+            'social_links' => 'nullable|array',
+            'price_range' => 'nullable|string|in:$,$$,$$$,$$$$',
         ];
     }
 }

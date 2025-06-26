@@ -37,7 +37,7 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $user = User::create($request->validated());
-      
+
         return response()->json($user, 201);
     }
 
@@ -70,7 +70,19 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
-        
+
         return response()->json(['message' => 'OK'], 200);
+    }
+
+    /**
+     * Get reviews for the specified user.
+     */
+    public function reviews(User $user)
+    {
+        $reviews = $user->reviews()
+            ->with(['foodSpot'])
+            ->paginate(10); // Adjust per page as needed
+
+        return response()->json($reviews);
     }
 }

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\ImageController;
+use App\Http\Controllers\API\FavouriteController;
+use App\Http\Controllers\API\ReviewLikeController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -20,9 +22,14 @@ Route::post('/email/verification-notification', [AuthController::class, 'resendV
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 
     // User routes
     Route::apiResource('users', UserController::class);
+    Route::get('/users/{user}/reviews', [UserController::class, 'reviews']); // Add this line
+    Route::get('/users/{user}/food-spots', [FoodSpotController::class, 'userFoodSpots']);
 
     // Food spot routes
     Route::apiResource('food-spots', FoodSpotController::class)->except(['index']);
@@ -36,4 +43,19 @@ Route::middleware('auth:sanctum')->group(function () {
     // Image routes
     Route::post('/images/{modelType}/{id}', [ImageController::class, 'upload']);
     Route::delete('/images/{model_type}/{id}/{image_id}', [ImageController::class, 'delete']);
+
+    // Nominatim search endpoint
+    Route::match(['get', 'post'], '/nominatim/search', [FoodSpotController::class, 'searchNominatim']);
+    Route::post('/food-spots/from-nominatim', [FoodSpotController::class, 'createFromNominatim']);
+
+    // Favourites routes
+    Route::get('/favourites', [\App\Http\Controllers\API\FavouriteController::class, 'index']);
+    Route::post('/food-spots/{foodSpotId}/favourite', [\App\Http\Controllers\API\FavouriteController::class, 'store']);
+    Route::delete('/food-spots/{foodSpotId}/favourite', [\App\Http\Controllers\API\FavouriteController::class, 'destroy']);
+
+    // Review likes routes
+    Route::post('/reviews/{review}/like', [ReviewLikeController::class, 'toggle']);
+    Route::get('/reviews/{review}/like', [ReviewLikeController::class, 'check']);
+    Route::get('/reviews/{review}/likes/users', [ReviewLikeController::class, 'users']);
+    Route::post('/reviews/likes/bulk-check', [ReviewLikeController::class, 'bulkCheck']);
 });

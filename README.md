@@ -1,266 +1,178 @@
 # Tsimpologion (MVP)
 
+## Table of Contents
+- [Description](#description)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Features](#features)
+- [API Endpoints](#api-endpoints)
+- [Database Schema](#database-schema)
+- [Usage](#usage)
+- [License](#license)
+- [Contact](#contact)
+
 ## Description
-This is the backend for a mobile app designed to help users discover authentic Greek food spots, including taverns, brunch cafes, pizzerias, and more. Built with Laravel, it provides a simple RESTful API to serve food spot data such as names, addresses, descriptions, ratings, and Google Maps links. Initially using a static dataset, future enhancements include dynamic data sources and extended filtering capabilities.
+Tsimpologion is a Laravel backend for a mobile app that helps users discover authentic Greek food spots. It provides a RESTful API for food spot data, user management, reviews, images, and more.
 
 ## Prerequisites
-To run this backend locally or deploy it, ensure you have the following installed:
 - PHP (>= 8.4)
 - Composer
-- MySQL (or SQLite for simplicity)
+- MySQL or SQLite
 - Git
-- A code editor (e.g., Visual Studio Code)
-- Postman (or a similar API testing tool)
+- Code editor (e.g., VS Code)
+- Postman or similar API tool
 
 ## Installation
-
-### Clone the Repository
-- git clone https://github.com/Pravinos/tsimpologion-backend.git
-- cd tsimpologion-backend
-
-### Install Dependencies
-- composer install
-
-### Set Up Environment
-- Copy the example file:
-  - cp .env.example .env
-- Edit the .env file with your database credentials:
-  - DB_CONNECTION=sqlite
-  - DB_DATABASE=tsimpologion_db
-- Set up mail configuration for email verification:
-  - MAIL_MAILER=smtp
-  - MAIL_HOST=your_mail_host
-  - MAIL_PORT=your_mail_port
-  - MAIL_USERNAME=your_mail_username
-  - MAIL_PASSWORD=your_mail_password
-  - MAIL_FROM_ADDRESS=your_from_address
-  - MAIL_FROM_NAME="${APP_NAME}"
-- Generate an application key:
-  - php artisan key:generate
-
-### Run Migrations
-- Ensure the database (e.g., tsimpologion_db) exists.
-- Run migrations:
-  - php artisan migrate
-
-### Seed the Database
-- Populate sample data:
-  - php artisan db:seed
-
-### Start the Server
-- Start Laravel's built-in server:
-  - php artisan serve --host=0.0.0.0 --port=8000
-- The API will be available at http://localhost:8000.
+1. Clone the repository and install dependencies:
+   - `git clone https://github.com/Pravinos/tsimpologion-backend.git`
+   - `cd tsimpologion-backend`
+   - `composer install`
+2. Copy `.env.example` to `.env` and configure your environment (DB, mail, etc.).
+3. Generate application key: `php artisan key:generate`
+4. Run migrations: `php artisan migrate`
+5. Seed the database: `php artisan db:seed`
+6. Start the server: `php artisan serve --host=0.0.0.0 --port=8000`
 
 ## Features
-
-### Authentication & Authorization
-- **User Authentication**: Users can register, log in, and log out using Laravel Sanctum, which supports both session-based and token-based authentication.
-- **Email Verification**: New users receive a verification email and must verify their email address before accessing the application.
-- **API Token Management**: Sanctum is configured for token expiration and prefixing to enhance security.
-- **User Policies**: User-related operations are secured via policies (see UserPolicy.php). For example, only administrators or the user themselves can update or delete a user record.
-- **Resource Policies**: Custom policies (e.g., FoodSpotPolicy in FoodSpotPolicy.php) control resource access, allowing administrators and food spot owners to manage food spots.
-- **Authorization Mapping**: The AuthServiceProvider maps models to corresponding policies for organized access control.
-
-### Role-Based Access Control
-- **Administrators**: Have complete access to manage all users and food spots.
-- **Spot Owners**: Can perform specific actions on the food spots they own.
-- **General Users**: Can view public listings and manage their own profiles.
-
-### Review & Rating System
-- **User Reviews**: Authenticated users can post, edit, and delete their reviews for food spots.
-- **Rating System**: Users can rate food spots from 1-5 stars.
-- **Moderation**: Admin users can moderate reviews by approving or disapproving them.
-- **Average Ratings**: Food spots display an aggregated average rating from all approved reviews.
-- **One Review Per User**: Users are limited to one review per food spot.
-
-### Image Management
-- **Image Upload**: Users can upload images for food spots and user profiles.
-- **Multiple Image Support**: Each model can have multiple associated images.
-- **Image Deletion**: Authorized users can delete images they've uploaded.
-- **Public Image Access**: Anyone can view images associated with public resources.
-- **Permission Management**: Images can only be managed by the resource owner or administrators.
+- **Authentication & Authorization**: Register, login, logout, email verification, and role-based access (admin, spot owner, foodie) using Laravel Sanctum.
+- **User Management**: CRUD for users, user roles, and profile images.
+- **Food Spot Management**: CRUD for food spots, including restore/force delete, owner assignment, and extra fields (phone, business hours, social links, price range).
+- **Review System**: Users can leave one review per food spot, with rating, images, moderation (admin approval), soft deletes, and likes.
+- **Favourites**: Users can favourite/unfavourite food spots and view their favourites.
+- **Image Management**: Upload, view, and delete images for users, food spots, and reviews. Images are stored using Supabase Storage.
+- **Nominatim Integration**: Search and create food spots using OpenStreetMap (Nominatim) data.
+- **Policies**: Fine-grained permissions for users, food spots, reviews, and images.
 
 ## API Endpoints
 
-### Authentication Endpoints
-- **POST /api/register** – Register a new user and trigger verification email
-- **POST /api/login** – Log in and retrieve an authentication token
-- **POST /api/logout** – Invalidate the current token (requires authentication)
-- **GET /api/email/verify/{id}/{hash}** – Verify user email with verification link
-- **POST /api/email/verification-notification** – Resend verification email
+### Authentication
+- `POST /api/register` – Register a new user
+- `POST /api/login` – Login and get token
+- `POST /api/logout` – Logout (auth required)
+- `GET /api/email/verify/{id}/{hash}` – Verify email
+- `POST /api/email/verification-notification` – Resend verification email
+- `GET /api/user` – Get current authenticated user
 
-### User Endpoints
-- **GET /api/users** – Retrieve a list of users (admin sees all; non-admins see limited results)
-- **GET /api/users/{id}** – Retrieve details of a specific user
-- **PUT/PATCH /api/users/{id}** – Update a specific user (admin or self-update)
-- **DELETE /api/users/{id}** – Delete a user (admin or self-delete)
+### Users
+- `GET /api/users` – List users
+- `GET /api/users/{id}` – User details
+- `PUT/PATCH /api/users/{id}` – Update user
+- `DELETE /api/users/{id}` – Delete user
+- `GET /api/users/{user}/reviews` – User's reviews
+- `GET /api/users/{user}/food-spots` – User's food spots
 
-### Food Spot Endpoints
+### Food Spots
+- `GET /api/food-spots` – List all food spots
+- `GET /api/food-spots/{food_spot}/rating` – Food spot average rating
+- `POST /api/food-spots` – Create food spot
+- `GET /api/food-spots/{id}` – Food spot details
+- `PUT/PATCH /api/food-spots/{id}` – Update food spot
+- `DELETE /api/food-spots/{id}` – Soft delete food spot
+- `PUT /api/food-spots/{id}/restore` – Restore food spot
+- `DELETE /api/food-spots/{id}/force` – Permanently delete food spot
+- `POST /api/food-spots/from-nominatim` – Create from Nominatim
 
-#### Public
-- **GET /api/food-spots** – Retrieve a list of all food spots
-- **GET /api/food-spots/{food_spot}/rating** – Get the average rating for a food spot
+### Nominatim
+- `GET|POST /api/nominatim/search` – Search food spots (OpenStreetMap)
 
-#### Protected (requires authentication)
-- **POST /api/food-spots** – Create a new food spot
-- **GET /api/food-spots/{id}** – Retrieve detailed food spot information
-- **PUT/PATCH /api/food-spots/{id}** – Update a food spot (admins and spot owners only)
-- **DELETE /api/food-spots/{id}** – Soft delete a food spot
-- **PUT /api/food-spots/{id}/restore** – Restore a soft-deleted food spot
-- **DELETE /api/food-spots/{id}/force** – Permanently delete a food spot
+### Reviews
+- `GET /api/food-spots/{food_spot}/reviews` – List reviews for a food spot
+- `POST /api/food-spots/{food_spot}/reviews` – Add review
+- `PUT /api/food-spots/{food_spot}/reviews/{review}` – Update review
+- `DELETE /api/food-spots/{food_spot}/reviews/{review}` – Delete review
+- `PUT /api/food-spots/{food_spot}/reviews/{review}/moderate` – Moderate review (admin)
+- `POST /api/reviews/{review}/like` – Like/unlike review
+- `GET /api/reviews/{review}/like` – Check if liked
+- `GET /api/reviews/{review}/likes/users` – Users who liked
+- `POST /api/reviews/likes/bulk-check` – Bulk like check
 
-### Review Endpoints
-- **GET /api/food-spots/{food_spot}/reviews** – Get all reviews for a food spot
-- **GET /api/food-spots/{food_spot}/reviews/{review}** – Get details of a specific review
-- **POST /api/food-spots/{food_spot}/reviews** – Create a new review (auth required)
-- **PUT /api/food-spots/{food_spot}/reviews/{review}** – Update a review (auth required, owner only)
-- **DELETE /api/food-spots/{food_spot}/reviews/{review}** – Delete a review (auth required, owner or admin)
-- **PUT /api/food-spots/{food_spot}/reviews/{review}/moderate** – Moderate a review (admin only)
+### Favourites
+- `GET /api/favourites` – List favourites
+- `POST /api/food-spots/{foodSpotId}/favourite` – Add favourite
+- `DELETE /api/food-spots/{foodSpotId}/favourite` – Remove favourite
 
-### Image Management Endpoints
-- **GET /api/images/{model_type}/{id}** – View all images for a specific resource
-- **GET /api/images/{model_type}/{id}/{image_id}** – View a specific image
-- **POST /api/images/{model_type}/{id}** – Upload images to a resource (auth required)
-- **DELETE /api/images/{model_type}/{id}/{image_id}** – Delete an image (auth required, owner or admin)
+### Images
+- `POST /api/images/{modelType}/{id}` – Upload images
+- `GET /api/images/{model_type}/{id}` – List images
+- `GET /api/images/{model_type}/{id}/{image_id}` – Get image
+- `DELETE /api/images/{model_type}/{id}/{image_id}` – Delete image
 
 ## Database Schema
 
-### Food Spots Table
-| Column       | Type         | Description                    | Example Value                  |
-|--------------|--------------|--------------------------------|-------------------------------|
-| id           | BIGINT (PK)  | Auto-incrementing primary key  | 1                             |
-| name         | VARCHAR(255) | Name of the food spot          | "Taverna To Koutouki"         |
-| category     | VARCHAR(255) | Category of the food spot      | Taverna                       |
-| city         | VARCHAR(255) | City of the spot               | Athens                        |
-| address      | VARCHAR(255) | Physical address               | "Leof. Mesogeion 123, Athens" |
-| description  | TEXT         | Short description of the spot  | "Cozy spot for grilled meats" |
-| info_link    | VARCHAR(255) | Google Maps share link         | "https://maps.app.goo.gl/xyz" |
-| rating       | FLOAT        | Calculated average rating      | 4.7                           |
-| owner_id     | BIGINT       | Foreign key to user who owns the spot | 2                      |
-| images       | JSON         | Stored images metadata         | JSON array of image objects   |
-| created_at   | TIMESTAMP    | Record creation time           | 2025-03-25 10:00:00           |
-| updated_at   | TIMESTAMP    | Record update time             | 2025-03-25 10:00:00           |
-| deleted_at   | TIMESTAMP    | Soft delete timestamp          | NULL                          |
+### Food Spots
+| Column         | Type         | Description                  |
+| -------------- | ------------ | ---------------------------- |
+| id             | BIGINT (PK)  | Primary key                  |
+| name           | VARCHAR(255) | Name                         |
+| category       | VARCHAR(255) | Category                     |
+| city           | VARCHAR(255) | City                         |
+| address        | VARCHAR(255) | Address                      |
+| description    | TEXT         | Description                  |
+| info_link      | VARCHAR(255) | Google Maps link             |
+| rating         | FLOAT        | Average rating               |
+| owner_id       | BIGINT       | Owner user id                |
+| images         | JSON         | Images metadata              |
+| phone          | VARCHAR(30)  | Phone number                 |
+| business_hours | JSON         | Opening hours                |
+| social_links   | JSON         | Social links                 |
+| price_range    | VARCHAR(10)  | Price range                  |
+| created_at     | TIMESTAMP    | Created at                   |
+| updated_at     | TIMESTAMP    | Updated at                   |
+| deleted_at     | TIMESTAMP    | Soft delete                  |
 
-### Users Table
-| Column       | Type         | Description                    | Example Value                  |
-|--------------|--------------|--------------------------------|-------------------------------|
-| id           | BIGINT (PK)  | Auto-incrementing primary key  | 1                             |
-| name         | VARCHAR(255) | User's name                    | "Admin User"                  |
-| email        | VARCHAR(255) | User's email (unique)          | "admin@example.com"           |
-| password     | VARCHAR(255) | Hashed password                | "$2y$10$92IXUNpkjO0..."      |
-| role         | VARCHAR(255) | User role                      | "admin"                       |
-| images       | JSON         | Stored profile images          | JSON array of image objects   |
-| email_verified_at | TIMESTAMP | Email verification timestamp | "2025-03-25 10:00:00"        |
-| created_at   | TIMESTAMP    | Record creation time           | 2025-03-25 10:00:00           |
-| updated_at   | TIMESTAMP    | Record update time             | 2025-03-25 10:00:00           |
+### Users
+| Column             | Type         | Description                  |
+| ------------------ | ------------ | ---------------------------- |
+| id                 | BIGINT (PK)  | Primary key                  |
+| name               | VARCHAR(255) | Name                         |
+| email              | VARCHAR(255) | Email (unique)               |
+| password           | VARCHAR(255) | Hashed password              |
+| role               | VARCHAR(255) | User role                    |
+| images             | JSON         | Profile images               |
+| email_verified_at  | TIMESTAMP    | Email verified at            |
+| created_at         | TIMESTAMP    | Created at                   |
+| updated_at         | TIMESTAMP    | Updated at                   |
 
-### Reviews Table
-| Column       | Type         | Description                    | Example Value                  |
-|--------------|--------------|--------------------------------|-------------------------------|
-| id           | BIGINT (PK)  | Auto-incrementing primary key  | 1                             |
-| food_spot_id | BIGINT (FK)  | Foreign key to food spot       | 1                             |
-| user_id      | BIGINT (FK)  | Foreign key to user            | 3                             |
-| comment      | TEXT         | Review comment                 | "Great food and atmosphere!"  |
-| rating       | INTEGER      | User rating (1-5)              | 5                             |
-| is_approved  | BOOLEAN      | Moderation status              | true                          |
-| images       | JSON         | Images attached to review      | JSON array of image objects   |
-| created_at   | TIMESTAMP    | Record creation time           | 2025-03-25 10:00:00           |
-| updated_at   | TIMESTAMP    | Record update time             | 2025-03-25 10:00:00           |
-| deleted_at   | TIMESTAMP    | Soft delete timestamp          | NULL                          |
+### Reviews
+| Column       | Type         | Description                  |
+| ------------ | ------------ | ---------------------------- |
+| id           | BIGINT (PK)  | Primary key                  |
+| food_spot_id | BIGINT (FK)  | Food spot id                 |
+| user_id      | BIGINT (FK)  | User id                      |
+| comment      | TEXT         | Review comment               |
+| rating       | INTEGER      | Rating (1-5)                 |
+| is_approved  | BOOLEAN      | Moderation status            |
+| images       | JSON         | Review images                |
+| created_at   | TIMESTAMP    | Created at                   |
+| updated_at   | TIMESTAMP    | Updated at                   |
+| deleted_at   | TIMESTAMP    | Soft delete                  |
 
-## Policies & Authorization
-- **UserPolicy**: Controls actions for viewing, creating, updating, and deleting user resources. Users can update or delete their own data or, if they are administrators, any user resource.
-- **FoodSpotPolicy**: Governs access to food spot actions. Administrators and spot owners have extended permissions while public users can only view food spot information.
-- **ReviewPolicy**: Controls who can create, update, delete, and moderate reviews. Users can only edit their own reviews, while admins can moderate and delete any review.
-- **AuthServiceProvider**: Maps models to policies, ensuring every request is authorized according to defined rules.
+### Review Likes
+| Column    | Type         | Description                  |
+| --------- | ------------ | ---------------------------- |
+| id        | BIGINT (PK)  | Primary key                  |
+| user_id   | BIGINT (FK)  | User who liked               |
+| review_id | BIGINT (FK)  | Review id                    |
+| created_at| TIMESTAMP    | Created at                   |
+| updated_at| TIMESTAMP    | Updated at                   |
 
-## Email Verification System
-- **Automatic Verification**: Upon registration, a verification email is automatically sent to new users.
-- **Secure Tokens**: Uses secure, time-limited tokens for email verification.
-- **Re-sending Option**: Users can request a new verification email if needed.
-- **Required Verification**: Email verification is required before users can fully access the application.
-- **Admin Override**: Admin accounts created via seeders are automatically verified.
-
-## Image Management System
-- **Multi-Model Support**: The image system works with Users, FoodSpots, and Reviews.
-- **JSON Storage**: Images are stored as JSON metadata in the respective model tables.
-- **Secure Access Control**: Each model implements userCanManageImages() to control permissions.
-- **Efficient Storage**: Images are stored using unique identifiers to prevent collisions.
-- **Public Access**: Public images can be viewed without authentication.
-
-## API Endpoints Summary
-
-### Authentication
-| Method | Endpoint         | Description                   |
-|--------|------------------|-------------------------------|
-| POST   | /api/register    | Register a new user and trigger verification email |
-| POST   | /api/login       | Log in and retrieve an auth token |
-| POST   | /api/logout      | Log out (invalidate token)    |
-| GET    | /api/email/verify/{id}/{hash} | Verify user email |
-| POST   | /api/email/verification-notification | Resend verification email |
-
-### User Resources
-| Method | Endpoint         | Description                   |
-|--------|------------------|-------------------------------|
-| GET    | /api/users       | Retrieve a list of users (access controlled by roles) |
-| GET    | /api/users/{id}  | Retrieve user details         |
-| PUT    | /api/users/{id}  | Update user information (admin or self-update only) |
-| DELETE | /api/users/{id}  | Delete a user record (admin or self-delete) |
-
-### Food Spot Resources
-| Method   | Endpoint                  | Description                   |
-|----------|---------------------------|-------------------------------|
-| GET      | /api/food-spots           | Public listing of all food spots |
-| POST     | /api/food-spots           | Create a new food spot (protected, authentication required) |
-| GET      | /api/food-spots/{id}      | Retrieve detailed food spot information |
-| PUT/PATCH| /api/food-spots/{id}      | Update a food spot (admins and spot owners only) |
-| DELETE   | /api/food-spots/{id}      | Soft delete a food spot (protected, authentication required) |
-| PUT      | /api/food-spots/{id}/restore | Restore a soft-deleted food spot (protected, authentication required) |
-| DELETE   | /api/food-spots/{id}/force | Permanently delete a food spot (protected, authentication required) |
-| GET      | /api/food-spots/{id}/rating | Get average rating for a food spot |
-
-### Review Resources
-| Method | Endpoint                           | Description                   |
-|--------|------------------------------------|-------------------------------|
-| GET    | /api/food-spots/{id}/reviews       | List all reviews for a food spot |
-| GET    | /api/food-spots/{id}/reviews/{review_id} | Get a specific review   |
-| POST   | /api/food-spots/{id}/reviews       | Add a review to a food spot (authenticated) |
-| PUT    | /api/food-spots/{id}/reviews/{review_id} | Update a review (owner only) |
-| DELETE | /api/food-spots/{id}/reviews/{review_id} | Delete a review (owner or admin) |
-| PUT    | /api/food-spots/{id}/reviews/{review_id}/moderate | Moderate a review (admin only) |
-
-### Image Resources
-| Method | Endpoint                           | Description                   |
-|--------|------------------------------------|-------------------------------|
-| GET    | /api/images/{model_type}/{id}      | Get all images for a resource |
-| GET    | /api/images/{model_type}/{id}/{image_id} | Get a specific image   |
-| POST   | /api/images/{model_type}/{id}      | Upload images (protected)     |
-| DELETE | /api/images/{model_type}/{id}/{image_id} | Delete an image (protected) |
+### Favourites
+| Column        | Type         | Description                  |
+| ------------- | ------------ | ---------------------------- |
+| id            | BIGINT (PK)  | Primary key                  |
+| user_id       | BIGINT (FK)  | User id                      |
+| food_spot_id  | BIGINT (FK)  | Food spot id                 |
+| created_at    | TIMESTAMP    | Created at                   |
+| updated_at    | TIMESTAMP    | Updated at                   |
 
 ## Usage
-
-### Local Testing
-- After starting the server with php artisan serve, use Postman or a browser to test endpoints, e.g., http://localhost:8000/api/food-spots.
-
-### Email Testing
-- For testing email verification locally, use Mailtrap or configure the mail driver to 'log' in your .env file.
-
-### Data Updates
-- For this MVP, data is static. To update food spot data, edit FoodSpotSeeder.php and run:
-  - php artisan db:seed --class=FoodSpotSeeder
-
-## Future Enhancements
-- Expand user authentication (e.g., adding OAuth support).
-- Integrate dynamic data sources (e.g., Google Places API).
-- Implement filters for food spots (e.g., by cuisine type or location).
-- Enhance error handling and logging mechanisms.
-- Add image resizing and optimization features.
+- Start the server and use Postman or a browser to test endpoints (e.g., `http://localhost:8000/api/food-spots`).
+- For email testing, use Mailtrap or set mail driver to 'log' in `.env`.
+- To update food spot data, edit `FoodSpotSeeder.php` and run: `php artisan db:seed --class=FoodSpotSeeder`.
 
 ## License
 This project is for portfolio purposes and is not currently licensed for public distribution.
 
 ## Contact
 Built by Thomas Pravinos.  
-Reach out at tpravinos99@gmail.com or visit [GitHub](https://github.com/Pravinos).
+Contact: tpravinos99@gmail.com or [GitHub](https://github.com/Pravinos).
