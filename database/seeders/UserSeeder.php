@@ -16,7 +16,10 @@ class UserSeeder extends Seeder
     {
         // Create an admin user
         User::create([
-            'name' => 'Admin',
+            'username' => 'admin',
+            'first_name' => 'Admin',
+            'last_name' => 'User',
+            'phone' => '6900000000',
             'email' => 'admin@example.com',
             'password' => bcrypt('password'),
             'role' => 'admin',
@@ -25,7 +28,10 @@ class UserSeeder extends Seeder
 
         // Create 2 spot owners
         User::create([
-            'name' => 'Thomas Afentiko',
+            'username' => 'afentiko',
+            'first_name' => 'Thomas',
+            'last_name' => 'Afentiko',
+            'phone' => '6900000001',
             'email' => 'afentiko@example.com',
             'password' => bcrypt('password'),
             'role' => 'spot_owner',
@@ -33,7 +39,10 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name' => 'Maria Nikolaou',
+            'username' => 'maria.n',
+            'first_name' => 'Maria',
+            'last_name' => 'Nikolaou',
+            'phone' => '6900000002',
             'email' => 'maria.n@example.com',
             'password' => bcrypt('password'),
             'role' => 'spot_owner',
@@ -41,35 +50,50 @@ class UserSeeder extends Seeder
 
         // Create 5 foodies
         User::create([
-            'name' => 'Nikos Dimitriou',
+            'username' => 'nikos.d',
+            'first_name' => 'Nikos',
+            'last_name' => 'Dimitriou',
+            'phone' => '6900000003',
             'email' => 'nikos.d@example.com',
             'password' => bcrypt('password'),
             'role' => 'foodie',
         ]);
 
         User::create([
-            'name' => 'Elena Panagiotou',
+            'username' => 'elena.p',
+            'first_name' => 'Elena',
+            'last_name' => 'Panagiotou',
+            'phone' => '6900000004',
             'email' => 'elena.p@example.com',
             'password' => bcrypt('password'),
             'role' => 'foodie',
         ]);
 
         User::create([
-            'name' => 'Yannis Antoniou',
+            'username' => 'yannis.a',
+            'first_name' => 'Yannis',
+            'last_name' => 'Antoniou',
+            'phone' => '6900000005',
             'email' => 'yannis.a@example.com',
             'password' => bcrypt('password'),
             'role' => 'foodie',
         ]);
 
         User::create([
-            'name' => 'Sofia Georgiou',
+            'username' => 'sofia.g',
+            'first_name' => 'Sofia',
+            'last_name' => 'Georgiou',
+            'phone' => '6900000006',
             'email' => 'sofia.g@example.com',
             'password' => bcrypt('password'),
             'role' => 'foodie',
         ]);
 
         User::create([
-            'name' => 'Kostas Alexiou',
+            'username' => 'kostas.a',
+            'first_name' => 'Kostas',
+            'last_name' => 'Alexiou',
+            'phone' => '6900000007',
             'email' => 'kostas.a@example.com',
             'password' => bcrypt('password'),
             'role' => 'foodie',

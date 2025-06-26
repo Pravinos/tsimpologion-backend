@@ -81,7 +81,7 @@ class ReviewLikeController extends Controller
     public function users(Review $review): JsonResponse
     {
         $users = $review->likes()
-            ->with('user:id,name')
+            ->with('user:id,username,first_name,last_name')
             ->get()
             ->pluck('user');
 

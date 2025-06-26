@@ -26,7 +26,7 @@ class ReviewController extends Controller
     {
         $query = $food_spot->reviews()
             ->where('is_approved', true)
-            ->with('user:id,name')
+            ->with('user:id,username')
             ->withCount('likes');
 
         // Apply sorting based on request
@@ -109,7 +109,7 @@ class ReviewController extends Controller
         // Verify the review belongs to this food spot
         if ($review->food_spot_id !== $food_spot->id) {
             return response()->json(['message' => 'Review not found for this food spot'], 404);
-        }        $review->load('user:id,name');
+        }        $review->load('user:id,username');
         $review->loadCount('likes');
         
         // Add is_liked field if user is authenticated
