@@ -17,14 +17,14 @@ class StoreFoodSpotRequest extends FormRequest
             'category' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'address' => 'required|string|max:255',
-            'description' => 'string',
-            'info_link' => 'string|max:500',
+            'description' => 'nullable|string',
+            'info_link' => 'nullable|string|max:500',
             'rating' => 'nullable|numeric|min:0|max:5',
             'owner_id' => 'nullable|numeric',
             'phone' => 'nullable|string|max:30',
             'business_hours' => 'nullable|array',
             'social_links' => 'nullable|array',
-            'price_range' => 'nullable|string|in:$,$$,$$$,$$$$',
+            'price_range' => 'nullable|string|in:€,€€,€€€,€€€€',
         ];
     }
 }
