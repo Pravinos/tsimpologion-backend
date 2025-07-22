@@ -171,7 +171,13 @@ Tsimpologion is a Laravel backend for a mobile app that helps users discover aut
 - To update food spot data, edit `FoodSpotSeeder.php` and run: `php artisan db:seed --class=FoodSpotSeeder`.
 
 ## License
-This project is for portfolio purposes and is not currently licensed for public distribution.
+
+This project is provided for **portfolio and demonstration purposes only**.
+
+All rights are reserved.  
+You may **view the source code**, but you are **not permitted** to copy, modify, reuse, or distribute any part of it without explicit permission from the author.
+
+For licensing inquiries, contact [tpravinos99@gmail.com](mailto:tpravinos99@gmail.com).
 
 ## Contact
 Built by Thomas Pravinos.  
