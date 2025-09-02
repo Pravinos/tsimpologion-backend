@@ -24,7 +24,7 @@ class StoreFoodSpotRequest extends FormRequest
             'phone' => 'nullable|string|max:30',
             'business_hours' => 'nullable|array',
             'social_links' => 'nullable|array',
-            'price_range' => 'nullable|string|in:€,€€,€€€,€€€€',
+            'price_range' => 'sometimes|nullable|string|in:€,€€,€€€,€€€€',
         ];
     }
 }
