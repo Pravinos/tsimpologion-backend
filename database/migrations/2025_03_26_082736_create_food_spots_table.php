@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('city');
             $table->string('address');
             $table->text('description')->nullable();
-            $table->string('info_link');
+            $table->string('info_link')->nullable();
             $table->decimal('rating', 3, 1)->nullable();
             $table->unsignedBigInteger('owner_id')->nullable();
             $table->json('images')->nullable();
